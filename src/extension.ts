@@ -6,19 +6,13 @@
 
 import * as vscode from "vscode";
 import { listProcesses, ProcessItem } from "./ps";
-import {
-  TreeDataProvider,
-  TreeItem,
-  EventEmitter,
-  Event
-} from "vscode";
+import { TreeDataProvider, TreeItem, EventEmitter, Event } from "vscode";
 
-const POLL_INTERVAL = 5000;
+const POLL_INTERVAL = 10000;
 
 let processViewer: vscode.TreeView<ProcessTreeItem>;
 
 export function activate(context: vscode.ExtensionContext) {
-  // context.subscriptions.push(vscode.commands.registerCommand('extension.vscode-processes.showProcessView', () => {
   if (!processViewer) {
     const pid = 1;
     const provider = new ProcessProvider(pid);
@@ -26,18 +20,20 @@ export function activate(context: vscode.ExtensionContext) {
       "extension.vscode-processes.processViewer",
       { treeDataProvider: provider }
     );
-    processViewer.onDidChangeVisibility(e => {
-      if (e.visible) {
-        provider.scheduleNextPoll();
-      }
-    });
   }
-  vscode.commands.executeCommand(
-    "setContext",
-    "extension.vscode-processes.processViewerContext",
-    true
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "extension.vscode-processes.showProcessView",
+      () => {
+        vscode.commands.executeCommand(
+          "setContext",
+          "extension.vscode-processes.processViewerContext",
+          true
+        );
+      }
+    )
   );
-  // }));
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
