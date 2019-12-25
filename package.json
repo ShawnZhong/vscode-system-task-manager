@@ -23,11 +23,8 @@
     "bugs": {
         "url": "https://github.com/ShawnZhong/vscode-system-task-manager/issues"
     },
-    "dependencies": {
-        "vscode-nls": "4.0.0"
-    },
+    "dependencies": {},
     "devDependencies": {
-        "@types/mocha": "^5.2.7",
         "@types/node": "^8.10.59",
         "typescript": "^3.7.4",
         "vsce": "^1.71.0",
@@ -38,7 +35,6 @@
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test",
         "package": "vsce package"
     },
     "main": "./out/extension",
@@ -47,20 +43,25 @@
     ],
     "contributes": {
         "viewsContainers": {
-            "activitybar": [{
-                "id": "system-task-manager",
-                "title": "System Task Manager",
-                "icon": "resources/icon.svg"
-            }]
+            "activitybar": [
+                {
+                    "id": "system-task-manager",
+                    "title": "System Task Manager",
+                    "icon": "resources/icon.svg"
+                }
+            ]
         },
         "views": {
-            "process-explorer": [{
-                "id": "extension.vscode-processes.processViewer",
-                "name": "Processes"
-            }]
+            "system-task-manager": [
+                {
+                    "id": "extension.vscode-processes.processViewer",
+                    "name": "Processes"
+                }
+            ]
         },
         "menus": {
-            "view/item/context": [{
+            "view/item/context": [
+                {
                     "command": "extension.vscode-processes.kill"
                 },
                 {
@@ -68,7 +69,8 @@
                 }
             ]
         },
-        "commands": [{
+        "commands": [
+            {
                 "command": "extension.vscode-processes.showProcessView",
                 "title": "Show Process View"
             },
