@@ -58,14 +58,12 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }
 
 class ProcessTreeItem extends TreeItem {
   _parent: ProcessTreeItem;
   _pid: number;
-  _cmd: string;
   _children: ProcessTreeItem[];
-  _load: string;
 
   constructor(parent: ProcessTreeItem, pid: number) {
     super("", vscode.TreeItemCollapsibleState.None);
@@ -94,19 +92,8 @@ class ProcessTreeItem extends TreeItem {
     const oldLabel = this.label;
     const oldTooltip = this.tooltip;
 
-    this._cmd = process.command;
     this.tooltip = process.command;
-
-    if (process.load) {
-      this._load = process.load;
-    }
-    if (this._load && process.mem) {
-      this.label = `${process.name} (${this._load}, ${process.mem})`;
-    } else if (process.mem) {
-      this.label = `${process.name} (${process.mem})`;
-    } else {
-      this.label = process.name;
-    }
+    this.label = `${process.name} (${process.load}, ${process.mem})`;
     let changed = this.label !== oldLabel || this.tooltip !== oldTooltip;
 
     // update children
@@ -184,30 +171,27 @@ export class ProcessProvider implements TreeDataProvider<ProcessTreeItem> {
     return processTreeItem;
   }
 
-  getParent(element: ProcessTreeItem): ProcessTreeItem {
-    return this._root;
-  }
-
   getChildren(
     element?: ProcessTreeItem
   ): vscode.ProviderResult<ProcessTreeItem[]> {
-    if (!element) {
-      if (!this._root) {
-        this._root = new ProcessTreeItem(undefined, 0);
-
-        return listProcesses()
-          .then(root => {
-            this.scheduleNextPoll(1);
-            this._root.merge(root);
-            return this._root.getChildren();
-          })
-          .catch(err => {
-            return this._root.getChildren();
-          });
-      }
-      element = this._root;
+    if (element) {
+      return [];
     }
-    return element.getChildren();
+
+    if (!this._root) {
+      this._root = new ProcessTreeItem(undefined, 0);
+
+      return listProcesses()
+        .then(root => {
+          this.scheduleNextPoll(1);
+          this._root.merge(root);
+          return this._root.getChildren();
+        })
+        .catch(err => {
+          return this._root.getChildren();
+        });
+    }
+    return this._root.getChildren();
   }
 
   scheduleNextPoll(cnt: number = 1) {
