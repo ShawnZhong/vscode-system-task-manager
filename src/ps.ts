@@ -20,9 +20,7 @@ export interface ProcessItem {
   children?: ProcessItem[];
 }
 
-export async function listProcesses(
-  rootPid: number = 1
-): Promise<ProcessItem> {
+export async function listProcesses(): Promise<ProcessItem> {
   let rootItem: ProcessItem = {
     name: "123",
     pid: 0,
@@ -30,9 +28,8 @@ export async function listProcesses(
     command: "123",
     parentPid: 0,
     load: "123",
-    mem:"123"
+    mem: "123"
   };
-
 
   const data = await si.processes();
   const processes = data.list.sort((p1, p2) => p1.pid - p2.pid);
