@@ -5,16 +5,14 @@
 
 "use strict";
 
-import { spawn, ChildProcess } from "child_process";
 import * as si from "systeminformation";
-import {convertBytesToLargestUnit} from "./utils"
-import { totalmem } from "os";
+import { convertBytesToLargestUnit } from "./utils";
 
 export interface ProcessItem {
   name: string;
-  cmd: string;
+  command: string;
   pid: number;
-  ppid: number;
+  parentPid: number;
   load: string;
   mem: string;
   user: string;
@@ -23,60 +21,37 @@ export interface ProcessItem {
 }
 
 export async function listProcesses(
-  rootPid: number,
-  withLoad: boolean
+  rootPid: number = 1
 ): Promise<ProcessItem> {
-  let rootItem: ProcessItem;
-  const map = new Map<number, ProcessItem>();
+  let rootItem: ProcessItem = {
+    name: "123",
+    pid: 0,
+    user: "me",
+    command: "123",
+    parentPid: 0,
+    load: "123",
+    mem:"123"
+  };
 
-  function addToTree(
-    name: string,
-    pid: number,
-    ppid: number,
-    cmd: string,
-    load: string,
-    mem: string,
-    user: string
-  ) {
-    
-  }
 
   const data = await si.processes();
-  const processes = data.list.sort((p1, p2) => p1.pid-p2.pid);
-  processes.forEach(proc => {
-    const {name, pid, parentPid, command, pcpu, mem_rss, user} = proc;
+  const processes = data.list.sort((p1, p2) => p1.pid - p2.pid);
+  const children = processes.map(proc => {
+    const { name, pid, parentPid, command, pcpu, mem_rss, user } = proc;
+    const item: ProcessItem = {
+      name,
+      pid,
+      user,
+      command,
+      parentPid: parentPid,
+      load: `${pcpu}%`,
+      mem: convertBytesToLargestUnit(mem_rss)
+    };
 
-    const parent = map.get(parentPid);
-    if (pid === rootPid || parent) {
-      const item: ProcessItem = {
-        name,
-        pid,
-        user,
-        cmd: command,
-        ppid: parentPid,
-        load: `${pcpu}%`,
-        mem: convertBytesToLargestUnit(mem_rss),
-      };
-      map.set(pid, item);
-
-      if (pid === rootPid) {
-        rootItem = item;
-      }
-
-      if (parent) {
-        if (!parent.children) {
-          parent.children = [];
-        }
-        parent.children.push(item);
-      }
-    }
-
-
+    return item;
   });
 
-  
+  rootItem.children = children;
 
   return rootItem;
 }
-
-

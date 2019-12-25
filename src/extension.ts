@@ -8,14 +8,13 @@ import * as vscode from "vscode";
 import { listProcesses, ProcessItem } from "./ps";
 import { TreeDataProvider, TreeItem, EventEmitter, Event } from "vscode";
 
-const POLL_INTERVAL = 10000;
+const POLL_INTERVAL = 5000;
 
 let processViewer: vscode.TreeView<ProcessTreeItem>;
 
 export function activate(context: vscode.ExtensionContext) {
   if (!processViewer) {
-    const pid = 1;
-    const provider = new ProcessProvider(pid);
+    const provider = new ProcessProvider();
     processViewer = vscode.window.createTreeView(
       "extension.vscode-processes.processViewer",
       { treeDataProvider: provider }
@@ -100,8 +99,8 @@ class ProcessTreeItem extends TreeItem {
         this.label = `[[ ${this.label} ]]`;
       }
     } else {
-      this._cmd = process.cmd;
-      this.tooltip = process.cmd;
+      this._cmd = process.command;
+      this.tooltip = process.command;
 
       if (process.load) {
         this._load = process.load;
@@ -185,8 +184,6 @@ export class ProcessProvider implements TreeDataProvider<ProcessTreeItem> {
   readonly onDidChangeTreeData: Event<ProcessTreeItem> = this
     ._onDidChangeTreeData.event;
 
-  constructor(private _pid: number) {}
-
   getTreeItem(
     processTreeItem: ProcessTreeItem
   ): ProcessTreeItem | Thenable<ProcessTreeItem> {
@@ -194,7 +191,7 @@ export class ProcessProvider implements TreeDataProvider<ProcessTreeItem> {
   }
 
   getParent(element: ProcessTreeItem): ProcessTreeItem {
-    return element._parent;
+    return this._root;
   }
 
   getChildren(
@@ -202,9 +199,9 @@ export class ProcessProvider implements TreeDataProvider<ProcessTreeItem> {
   ): vscode.ProviderResult<ProcessTreeItem[]> {
     if (!element) {
       if (!this._root) {
-        this._root = new ProcessTreeItem(undefined, this._pid);
+        this._root = new ProcessTreeItem(undefined, 0);
 
-        return listProcesses(this._pid, true)
+        return listProcesses()
           .then(root => {
             this.scheduleNextPoll(1);
             this._root.merge(root);
@@ -221,10 +218,8 @@ export class ProcessProvider implements TreeDataProvider<ProcessTreeItem> {
 
   scheduleNextPoll(cnt: number = 1) {
     setTimeout(_ => {
-      const start = Date.now();
-      listProcesses(this._pid, cnt % 4 === 0)
+      listProcesses()
         .then(root => {
-          // console.log(`duration: ${Date.now() - start}`);
           if (processViewer.visible) {
             // schedule next poll only if still visible
             this.scheduleNextPoll(cnt + 1);
