@@ -23,7 +23,9 @@
   "bugs": {
     "url": "https://github.com/ShawnZhong/vscode-system-task-manager/issues"
   },
-  "dependencies": {},
+  "dependencies": {
+    "systeminformation": "^4.16.0"
+  },
   "devDependencies": {
     "@types/node": "^8.10.59",
     "typescript": "^3.7.4",
