@@ -1,0 +1,85 @@
+{
+    "name": "system-task-manager",
+    "displayName": "System Task Manager",
+    "description": "System Task Manager",
+    "version": "0.0.1",
+    "publisher": "shawnzhong",
+    "author": {
+        "name": "Shawn Zhong",
+        "email": "public@shawnzhong.com"
+    },
+    "license": "MIT",
+    "engines": {
+        "vscode": "^1.29.0",
+        "node": "^8.9.3"
+    },
+    "categories": [
+        "Other"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ShawnZhong/vscode-system-task-manager.git"
+    },
+    "bugs": {
+        "url": "https://github.com/ShawnZhong/vscode-system-task-manager/issues"
+    },
+    "dependencies": {
+        "vscode-nls": "4.0.0"
+    },
+    "devDependencies": {
+        "@types/mocha": "^5.2.7",
+        "@types/node": "^8.10.59",
+        "typescript": "^3.7.4",
+        "vsce": "^1.71.0",
+        "vscode": "^1.1.36"
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test",
+        "package": "vsce package"
+    },
+    "main": "./out/extension",
+    "activationEvents": [
+        "onCommand:extension.vscode-processes.showProcessView"
+    ],
+    "contributes": {
+        "viewsContainers": {
+            "activitybar": [{
+                "id": "system-task-manager",
+                "title": "System Task Manager",
+                "icon": "resources/icon.svg"
+            }]
+        },
+        "views": {
+            "process-explorer": [{
+                "id": "extension.vscode-processes.processViewer",
+                "name": "Processes"
+            }]
+        },
+        "menus": {
+            "view/item/context": [{
+                    "command": "extension.vscode-processes.kill"
+                },
+                {
+                    "command": "extension.vscode-processes.forceKill"
+                }
+            ]
+        },
+        "commands": [{
+                "command": "extension.vscode-processes.showProcessView",
+                "title": "Show Process View"
+            },
+            {
+                "command": "extension.vscode-processes.forceKill",
+                "title": "Force Kill Process"
+            },
+            {
+                "command": "extension.vscode-processes.kill",
+                "title": "Kill Process"
+            }
+        ]
+    }
+}
