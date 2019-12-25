@@ -14,7 +14,6 @@ import {
 } from "vscode";
 
 const POLL_INTERVAL = 5000;
-const KEEP_TERMINATED = false;
 
 let processViewer: vscode.TreeView<ProcessTreeItem>;
 
@@ -149,10 +148,6 @@ class ProcessTreeItem extends TreeItem {
           const found = process.children.find(c => child._pid === c.pid);
           if (!found) {
             changed = true;
-            if (KEEP_TERMINATED) {
-              child.merge(null, newItems);
-              nextChildren.push(child);
-            }
           }
         }
       }
