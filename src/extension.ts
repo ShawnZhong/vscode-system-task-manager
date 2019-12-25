@@ -93,25 +93,19 @@ class ProcessTreeItem extends TreeItem {
     // update item's name
     const oldLabel = this.label;
     const oldTooltip = this.tooltip;
-    if (process === null) {
-      // terminated
-      if (!this.label.startsWith("[[ ")) {
-        this.label = `[[ ${this.label} ]]`;
-      }
-    } else {
-      this._cmd = process.command;
-      this.tooltip = process.command;
 
-      if (process.load) {
-        this._load = process.load;
-      }
-      if (this._load && process.mem) {
-        this.label = `${process.name} (${this._load}, ${process.mem})`;
-      } else if (process.mem) {
-        this.label = `${process.name} (${process.mem})`;
-      } else {
-        this.label = process.name;
-      }
+    this._cmd = process.command;
+    this.tooltip = process.command;
+
+    if (process.load) {
+      this._load = process.load;
+    }
+    if (this._load && process.mem) {
+      this.label = `${process.name} (${this._load}, ${process.mem})`;
+    } else if (process.mem) {
+      this.label = `${process.name} (${process.mem})`;
+    } else {
+      this.label = process.name;
     }
     let changed = this.label !== oldLabel || this.tooltip !== oldTooltip;
 
