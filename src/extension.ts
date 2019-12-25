@@ -10,14 +10,11 @@ import {
   TreeDataProvider,
   TreeItem,
   EventEmitter,
-  Event,
-  ProviderResult
+  Event
 } from "vscode";
 
-const POLL_INTERVAL = 10000;
+const POLL_INTERVAL = 5000;
 const KEEP_TERMINATED = false;
-
-const DEBUG_FLAGS_PATTERN = /\s--(inspect|debug)(-(brk|port))?(=\d+)?/;
 
 let processViewer: vscode.TreeView<ProcessTreeItem>;
 
