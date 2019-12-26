@@ -22,13 +22,13 @@ export interface ProcessItem {
 
 export async function listProcesses(): Promise<ProcessItem> {
   let rootItem: ProcessItem = {
-    name: "123",
+    name: "",
     pid: 0,
-    user: "me",
-    command: "123",
+    user: "",
+    command: "",
     parentPid: 0,
-    load: "123",
-    mem: "123"
+    load: "",
+    mem: ""
   };
 
   const data = await si.processes();
@@ -40,7 +40,7 @@ export async function listProcesses(): Promise<ProcessItem> {
       pid,
       user,
       command,
-      parentPid: parentPid,
+      parentPid,
       load: `${pcpu}%`,
       mem: convertBytesToLargestUnit(mem_rss)
     };

@@ -8,7 +8,7 @@ import * as vscode from "vscode";
 import { listProcesses, ProcessItem } from "./ps";
 import { TreeDataProvider, TreeItem, EventEmitter, Event } from "vscode";
 
-const POLL_INTERVAL = 5000;
+const POLL_INTERVAL = 500;
 
 let processViewer: vscode.TreeView<ProcessTreeItem>;
 
@@ -58,7 +58,7 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() { }
+export function deactivate() {}
 
 class ProcessTreeItem extends TreeItem {
   _parent: ProcessTreeItem;
@@ -92,7 +92,11 @@ class ProcessTreeItem extends TreeItem {
     const oldLabel = this.label;
     const oldTooltip = this.tooltip;
 
-    this.tooltip = process.command;
+    this.tooltip = [
+      `Name: ${process.command}`,
+      `CPU Load: ${process.load}`,
+      `Memory: ${process.mem}`
+    ].join("\n");
     this.label = `${process.name} (${process.load}, ${process.mem})`;
     let changed = this.label !== oldLabel || this.tooltip !== oldTooltip;
 
