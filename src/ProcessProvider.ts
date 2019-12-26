@@ -49,34 +49,31 @@ export class ProcessProvider implements TreeDataProvider<ProcessTreeItem> {
 
     this._root = new ProcessTreeItem(undefined, 0);
     return listProcesses().then(root => {
-      this.scheduleNextPoll(1);
+      this.scheduleNextPoll();
       this._root.merge(root);
       return this._root.getChildren();
     });
   }
 
-  scheduleNextPoll(cnt: number = 1) {
-    setTimeout(_ => {
-      listProcesses().then(root => {
-        if (processViewer.visible) {
-          // schedule next poll only if still visible
-          this.scheduleNextPoll(cnt + 1);
-        }
-        const newItems: ProcessTreeItem[] = [];
-        let processTreeItem = this._root.merge(root, newItems);
-        if (processTreeItem) {
-          // workaround for https://github.com/Microsoft/vscode/issues/40185
-          if (processTreeItem === this._root) {
-            processTreeItem = undefined;
-          }
-          this._emitter.fire(processTreeItem);
-          if (processViewer.visible) {
-            // for (const newItem of newItems) {
-            //   processViewer.reveal(newItem, { select: false });
-            // }
-          }
-        }
-      });
-    }, POLL_INTERVAL);
+  async update() {
+    const root = await listProcesses();
+
+    if (processViewer.visible) {
+      // schedule next poll only if still visible
+      this.scheduleNextPoll();
+    }
+    let processTreeItem = this._root.merge(root);
+
+    if (processTreeItem) {
+      // workaround for https://github.com/Microsoft/vscode/issues/40185
+      if (processTreeItem === this._root) {
+        processTreeItem = undefined;
+      }
+      this._emitter.fire(processTreeItem);
+    }
+  }
+
+  scheduleNextPoll() {
+    setTimeout(() => this.update(), POLL_INTERVAL);
   }
 }
