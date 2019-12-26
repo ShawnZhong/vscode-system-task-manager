@@ -7,6 +7,7 @@
 import * as vscode from "vscode";
 import { listProcesses, ProcessItem } from "./ps";
 import { TreeDataProvider, TreeItem, EventEmitter, Event } from "vscode";
+import { convertBytesToLargestUnit } from "./utils";
 
 const POLL_INTERVAL = 500;
 
@@ -88,16 +89,20 @@ class ProcessTreeItem extends TreeItem {
       return undefined;
     }
 
+    const { command, name } = process;
+    const load = `${process.pcpu}%`;
+    const mem = convertBytesToLargestUnit(process.mem_rss);
+
     // update item's name
     const oldLabel = this.label;
     const oldTooltip = this.tooltip;
 
     this.tooltip = [
-      `Name: ${process.command}`,
-      `CPU Load: ${process.load}`,
-      `Memory: ${process.mem}`
+      `Name: ${command}`,
+      `CPU Load: ${load}%`,
+      `Memory: ${mem}`
     ].join("\n");
-    this.label = `${process.name} (${process.load}, ${process.mem})`;
+    this.label = `${name} (${load}, ${mem})`;
     let changed = this.label !== oldLabel || this.tooltip !== oldTooltip;
 
     // update children
