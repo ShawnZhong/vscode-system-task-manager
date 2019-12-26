@@ -9,7 +9,7 @@ import {
   Systeminformation
 } from "systeminformation";
 
-const POLL_INTERVAL = 500;
+const POLL_INTERVAL = 1000;
 
 export interface ProcessItem extends Systeminformation.ProcessesProcessData {
   children?: ProcessItem[];

@@ -32,7 +32,7 @@ export class ProcessTreeItem extends TreeItem {
       return undefined;
     }
 
-    const { command, name } = process;
+    const { name, user, started, pid } = process;
     const load = `${process.pcpu}%`;
     const mem = convertBytesToLargestUnit(process.mem_rss);
 
@@ -41,9 +41,12 @@ export class ProcessTreeItem extends TreeItem {
     const oldTooltip = this.tooltip;
 
     this.tooltip = [
-      `Name: ${command}`,
-      `CPU Load: ${load}%`,
-      `Memory: ${mem}`
+      `PID: ${pid}`,
+      `Name: ${name}`,
+      `CPU Load: ${load}`,
+      `Memory: ${mem}`,
+      `User: ${user}`,
+      `Start Time: ${started}`
     ].join("\n");
     this.label = `${name} (${load}, ${mem})`;
     let changed = this.label !== oldLabel || this.tooltip !== oldTooltip;
