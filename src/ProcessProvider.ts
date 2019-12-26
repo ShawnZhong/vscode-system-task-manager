@@ -9,7 +9,7 @@ import {
   Systeminformation
 } from "systeminformation";
 
-const POLL_INTERVAL = 1000;
+const POLL_INTERVAL = 500;
 
 export interface ProcessItem extends Systeminformation.ProcessesProcessData {
   children?: ProcessItem[];
@@ -17,6 +17,7 @@ export interface ProcessItem extends Systeminformation.ProcessesProcessData {
 
 export async function listProcesses(): Promise<ProcessItem> {
   const data = await getProcesses();
+  console.log("listProcesses called");
   const processes = data.list.sort((p1, p2) => p1.pid - p2.pid);
 
   const root = {} as ProcessItem;
@@ -26,17 +27,15 @@ export async function listProcesses(): Promise<ProcessItem> {
 
 export class ProcessProvider implements TreeDataProvider<ProcessTreeItem> {
   private _root: ProcessTreeItem;
+  private _emitter = new EventEmitter<ProcessTreeItem>();
+  readonly onDidChangeTreeData: Event<ProcessTreeItem> = this._emitter.event;
 
-  private _onDidChangeTreeData: EventEmitter<
-    ProcessTreeItem
-  > = new EventEmitter<ProcessTreeItem>();
-  readonly onDidChangeTreeData: Event<ProcessTreeItem> = this
-    ._onDidChangeTreeData.event;
-
-  getTreeItem(
-    processTreeItem: ProcessTreeItem
-  ): ProcessTreeItem | Thenable<ProcessTreeItem> {
+  getTreeItem(processTreeItem: ProcessTreeItem): ProcessTreeItem {
     return processTreeItem;
+  }
+
+  getParent(element: ProcessTreeItem): ProcessTreeItem {
+    return element._parent;
   }
 
   getChildren(element?: ProcessTreeItem): ProviderResult<ProcessTreeItem[]> {
@@ -44,55 +43,40 @@ export class ProcessProvider implements TreeDataProvider<ProcessTreeItem> {
       return [];
     }
 
-    if (!this._root) {
-      this._root = new ProcessTreeItem(undefined, 0);
-
-      return listProcesses()
-        .then(root => {
-          this.scheduleNextPoll(1);
-          this._root.merge(root);
-          return this._root.getChildren();
-        })
-        .catch(err => {
-          return this._root.getChildren();
-        });
+    if (this._root) {
+      return this._root.getChildren();
     }
-    return this._root.getChildren();
+
+    this._root = new ProcessTreeItem(undefined, 0);
+    return listProcesses().then(root => {
+      this.scheduleNextPoll(1);
+      this._root.merge(root);
+      return this._root.getChildren();
+    });
   }
 
   scheduleNextPoll(cnt: number = 1) {
     setTimeout(_ => {
-      listProcesses()
-        .then(root => {
+      listProcesses().then(root => {
+        if (processViewer.visible) {
+          // schedule next poll only if still visible
+          this.scheduleNextPoll(cnt + 1);
+        }
+        const newItems: ProcessTreeItem[] = [];
+        let processTreeItem = this._root.merge(root, newItems);
+        if (processTreeItem) {
+          // workaround for https://github.com/Microsoft/vscode/issues/40185
+          if (processTreeItem === this._root) {
+            processTreeItem = undefined;
+          }
+          this._emitter.fire(processTreeItem);
           if (processViewer.visible) {
-            // schedule next poll only if still visible
-            this.scheduleNextPoll(cnt + 1);
+            // for (const newItem of newItems) {
+            //   processViewer.reveal(newItem, { select: false });
+            // }
           }
-          const newItems: ProcessTreeItem[] = [];
-          let processTreeItem = this._root.merge(root, newItems);
-          if (processTreeItem) {
-            // workaround for https://github.com/Microsoft/vscode/issues/40185
-            if (processTreeItem === this._root) {
-              processTreeItem = undefined;
-            }
-            this._onDidChangeTreeData.fire(processTreeItem);
-            if (newItems.length > 0 && processViewer.visible) {
-              for (const newItem of newItems) {
-                processViewer.reveal(newItem, { select: false }).then(
-                  () => {
-                    // ok
-                  },
-                  error => {
-                    //console.log(error + ': ' + newItem.label);
-                  }
-                );
-              }
-            }
-          }
-        })
-        .catch(err => {
-          // if we do not call 'scheduleNextPoll', polling stops
-        });
+        }
+      });
     }, POLL_INTERVAL);
   }
 }
