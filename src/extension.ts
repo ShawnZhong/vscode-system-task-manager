@@ -4,20 +4,34 @@
 
 "use strict";
 
-import { TreeView, ExtensionContext, commands, window } from "vscode";
+import {
+  TreeView,
+  ExtensionContext,
+  commands,
+  window,
+  TreeViewVisibilityChangeEvent
+} from "vscode";
 import { ProcessProvider } from "./ProcessProvider";
 import { ProcessTreeItem } from "./ProcessTreeItem";
 
 export let processViewer: TreeView<ProcessTreeItem>;
 
 export function activate(context: ExtensionContext) {
-  if (!processViewer) {
-    const provider = new ProcessProvider();
-    processViewer = window.createTreeView(
-      "extension.vscode-processes.processViewer",
-      { treeDataProvider: provider }
-    );
-  }
+  if (processViewer) return;
+
+  const provider = new ProcessProvider();
+  processViewer = window.createTreeView(
+    "extension.vscode-processes.processViewer",
+    { treeDataProvider: provider }
+  );
+
+  processViewer.onDidChangeVisibility((e: TreeViewVisibilityChangeEvent) => {
+    if (e.visible) {
+      provider.startUpdate();
+    } else {
+      provider.stopUpdate();
+    }
+  });
 
   context.subscriptions.push(
     commands.registerCommand(
@@ -29,27 +43,19 @@ export function activate(context: ExtensionContext) {
           true
         );
       }
-    )
-  );
-
-  context.subscriptions.push(
-    commands.registerCommand(
-      "extension.vscode-processes.kill",
-      (item: ProcessTreeItem) => {
-        if (item._pid) {
-          process.kill(item._pid, "SIGTERM");
-        }
-      }
-    )
-  );
-
-  context.subscriptions.push(
+    ),
     commands.registerCommand(
       "extension.vscode-processes.forceKill",
       (item: ProcessTreeItem) => {
-        if (item._pid) {
-          process.kill(item._pid, "SIGKILL");
-        }
+        if (!item._pid) return;
+        process.kill(item._pid, "SIGKILL");
+      }
+    ),
+    commands.registerCommand(
+      "extension.vscode-processes.kill",
+      (item: ProcessTreeItem) => {
+        if (!item._pid) return;
+        process.kill(item._pid, "SIGTERM");
       }
     )
   );

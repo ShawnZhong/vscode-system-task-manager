@@ -77,12 +77,12 @@
         "title": "Show Process View"
       },
       {
-        "command": "extension.vscode-processes.forceKill",
-        "title": "Force Kill Process"
-      },
-      {
         "command": "extension.vscode-processes.kill",
         "title": "Kill Process"
+      },
+      {
+        "command": "extension.vscode-processes.forceKill",
+        "title": "Force Kill Process"
       }
     ]
   }

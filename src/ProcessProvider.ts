@@ -1,15 +1,15 @@
 "use strict";
 
 import { ProviderResult, TreeDataProvider, EventEmitter, Event } from "vscode";
-
-import { processViewer } from "./extension";
-import { ProcessTreeItem } from "./ProcessTreeItem";
 import {
   processes as getProcesses,
   Systeminformation
 } from "systeminformation";
 
-const POLL_INTERVAL = 500;
+import { processViewer } from "./extension";
+import { ProcessTreeItem } from "./ProcessTreeItem";
+
+const POLL_INTERVAL = 1000;
 
 export interface ProcessItem extends Systeminformation.ProcessesProcessData {
   children?: ProcessItem[];
@@ -17,7 +17,6 @@ export interface ProcessItem extends Systeminformation.ProcessesProcessData {
 
 export async function listProcesses(): Promise<ProcessItem> {
   const data = await getProcesses();
-  console.log("listProcesses called");
   const processes = data.list.sort((p1, p2) => p1.pid - p2.pid);
 
   const root = {} as ProcessItem;
@@ -27,6 +26,7 @@ export async function listProcesses(): Promise<ProcessItem> {
 
 export class ProcessProvider implements TreeDataProvider<ProcessTreeItem> {
   private _root: ProcessTreeItem;
+  private _updateTimeoutId: NodeJS.Timer;
   private _emitter = new EventEmitter<ProcessTreeItem>();
   readonly onDidChangeTreeData: Event<ProcessTreeItem> = this._emitter.event;
 
@@ -49,19 +49,22 @@ export class ProcessProvider implements TreeDataProvider<ProcessTreeItem> {
 
     this._root = new ProcessTreeItem(undefined, 0);
     return listProcesses().then(root => {
-      this.scheduleNextPoll();
       this._root.merge(root);
       return this._root.getChildren();
     });
   }
 
+  stopUpdate() {
+    clearTimeout(this._updateTimeoutId);
+  }
+
+  startUpdate() {
+    this.update();
+    this._updateTimeoutId = setTimeout(() => this.startUpdate(), POLL_INTERVAL);
+  }
+
   async update() {
     const root = await listProcesses();
-
-    if (processViewer.visible) {
-      // schedule next poll only if still visible
-      this.scheduleNextPoll();
-    }
     let processTreeItem = this._root.merge(root);
 
     if (processTreeItem) {
@@ -71,9 +74,5 @@ export class ProcessProvider implements TreeDataProvider<ProcessTreeItem> {
       }
       this._emitter.fire(processTreeItem);
     }
-  }
-
-  scheduleNextPoll() {
-    setTimeout(() => this.update(), POLL_INTERVAL);
   }
 }
