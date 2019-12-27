@@ -64,6 +64,7 @@ export class ProcessProvider implements TreeDataProvider<ProcessTreeItem> {
   }
 
   async update() {
+    console.log(`Updated ${new Date().toLocaleTimeString()}`);
     const root = await listProcesses();
     let processTreeItem = this._root.merge(root);
 

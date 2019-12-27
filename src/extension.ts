@@ -33,13 +33,6 @@ export function activate(context: ExtensionContext) {
   });
 
   context.subscriptions.push(
-    commands.registerCommand("system-task-manager.showProcessView", () => {
-      commands.executeCommand(
-        "setContext",
-        "system-task-manager.processViewerContext",
-        true
-      );
-    }),
     commands.registerCommand(
       "system-task-manager.forceKill",
       (item: ProcessTreeItem) => {
@@ -53,7 +46,10 @@ export function activate(context: ExtensionContext) {
         if (!item._pid) return;
         process.kill(item._pid, "SIGTERM");
       }
-    )
+    ),
+    commands.registerCommand("system-task-manager.refresh", () => {
+      provider.update();
+    })
   );
 }
 
