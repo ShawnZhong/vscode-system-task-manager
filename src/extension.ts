@@ -11,44 +11,58 @@ import {
   window,
   TreeViewVisibilityChangeEvent
 } from "vscode";
-import { ProcessProvider } from "./ProcessProvider";
-import { ProcessTreeItem } from "./ProcessTreeItem";
-
-export let processViewer: TreeView<ProcessTreeItem>;
+import { ProcessProvider, ConnectionProvider } from "./provider";
+import { SysInfoTreeItem } from "./ProcessTreeItem";
 
 export function activate(context: ExtensionContext) {
-  if (processViewer) return;
-
-  const provider = new ProcessProvider();
-  processViewer = window.createTreeView("system-task-manager.processViewer", {
-    treeDataProvider: provider
-  });
+  const processProvider = new ProcessProvider();
+  const processViewer: TreeView<SysInfoTreeItem> = window.createTreeView(
+    "system-task-manager.processViewer",
+    {
+      treeDataProvider: processProvider
+    }
+  );
 
   processViewer.onDidChangeVisibility((e: TreeViewVisibilityChangeEvent) => {
     if (e.visible) {
-      provider.startUpdate();
+      processProvider.startUpdate();
     } else {
-      provider.stopUpdate();
+      processProvider.stopUpdate();
+    }
+  });
+
+  const connectionProvider = new ConnectionProvider();
+  const networkViewer = window.createTreeView(
+    "system-task-manager.networkViewer",
+    {
+      treeDataProvider: connectionProvider
+    }
+  );
+  networkViewer.onDidChangeVisibility((e: TreeViewVisibilityChangeEvent) => {
+    if (e.visible) {
+      connectionProvider.startUpdate();
+    } else {
+      connectionProvider.stopUpdate();
     }
   });
 
   context.subscriptions.push(
     commands.registerCommand(
       "system-task-manager.forceKill",
-      (item: ProcessTreeItem) => {
+      (item: SysInfoTreeItem) => {
         if (!item._pid) return;
         process.kill(item._pid, "SIGKILL");
       }
     ),
     commands.registerCommand(
       "system-task-manager.kill",
-      (item: ProcessTreeItem) => {
+      (item: SysInfoTreeItem) => {
         if (!item._pid) return;
         process.kill(item._pid, "SIGTERM");
       }
     ),
     commands.registerCommand("system-task-manager.refresh", () => {
-      provider.update();
+      processProvider.update();
     })
   );
 }

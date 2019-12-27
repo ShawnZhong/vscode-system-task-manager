@@ -1,67 +1,60 @@
 "use strict";
 
 import { TreeItem, TreeItemCollapsibleState } from "vscode";
-import { convertBytesToLargestUnit } from "./utils";
-import { ProcessItem } from "./ProcessProvider";
 
-export class ProcessTreeItem extends TreeItem {
-  _parent: ProcessTreeItem;
+import { SysInfoItem } from "./provider";
+
+export class SysInfoTreeItem extends TreeItem {
+  _parent: SysInfoTreeItem;
   _pid: number;
-  _children: ProcessTreeItem[];
+  _children: SysInfoTreeItem[];
 
-  constructor(parent: ProcessTreeItem, pid: number) {
+  constructor(parent: SysInfoTreeItem, pid: number, id: string) {
     super("", TreeItemCollapsibleState.None);
     this._parent = parent;
     this._pid = pid;
+    this.id = id;
   }
 
-  getChildren(): ProcessTreeItem[] {
+  getChildren(): SysInfoTreeItem[] {
     return this._children || [];
   }
 
-  get id(): string {
-    return this._pid.toString();
+  makeTooltip(process: SysInfoItem): string {
+    return process.toString();
+  }
+  makeLabel(process: SysInfoItem): string {
+    return process.toString();
   }
 
   /*
    * Update this item with the information from the given ProcessItem.
    * Returns the elementId of the subtree that needs to be refreshed or undefined if nothing has changed.
    */
-  merge(process: ProcessItem, newItems?: ProcessTreeItem[]): ProcessTreeItem {
+  merge(process: SysInfoItem, newItems?: SysInfoTreeItem[]): SysInfoTreeItem {
     if (!process) {
       return undefined;
     }
-
-    const { name, user, started, pid } = process;
-    const load = `${process.pcpu}%`;
-    const mem = convertBytesToLargestUnit(process.mem_rss);
 
     // update item's name
     const oldLabel = this.label;
     const oldTooltip = this.tooltip;
 
-    this.tooltip = [
-      `PID: ${pid}`,
-      `Name: ${name}`,
-      `CPU Load: ${load}`,
-      `Memory: ${mem}`,
-      `User: ${user}`,
-      `Start Time: ${started}`
-    ].join("\n");
-    this.label = `${name} (${load}, ${mem})`;
+    this.tooltip = process.tooltip;
+    this.label = process.label;
     let changed = this.label !== oldLabel || this.tooltip !== oldTooltip;
 
     // update children
-    const childChanges: ProcessTreeItem[] = [];
-    const nextChildren: ProcessTreeItem[] = [];
+    const childChanges: SysInfoTreeItem[] = [];
+    const nextChildren: SysInfoTreeItem[] = [];
     if (process) {
       process.children = process.children || [];
       for (const child of process.children) {
         let found = this._children
-          ? this._children.find(c => child.pid === c._pid)
+          ? this._children.find(c => child.id === c.id)
           : undefined;
         if (!found) {
-          found = new ProcessTreeItem(this, child.pid);
+          found = new SysInfoTreeItem(this, child.pid, child.id);
           if (newItems) {
             newItems.push(found);
           }
@@ -76,7 +69,7 @@ export class ProcessTreeItem extends TreeItem {
 
       if (this._children) {
         for (const child of this._children) {
-          const found = process.children.find(c => child._pid === c.pid);
+          const found = process.children.find(c => child.id === c.id);
           if (!found) {
             changed = true;
           }

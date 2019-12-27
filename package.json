@@ -58,12 +58,17 @@
         {
           "id": "system-task-manager.processViewer",
           "name": "Processes"
+        },
+        {
+          "id": "system-task-manager.networkViewer",
+          "name": "Network"
         }
       ]
     },
     "menus": {
-      "view/title":[
-        {"command": "system-task-manager.refresh",
+      "view/title": [
+        {
+          "command": "system-task-manager.refresh",
           "group": "navigation"
         }
       ],
@@ -91,8 +96,7 @@
       },
       {
         "command": "system-task-manager.refresh",
-        "title": "Refresh",
-        "icon": "resources/refresh.svg"
+        "title": "Refresh"
       }
     ]
   }
