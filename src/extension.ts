@@ -20,10 +20,9 @@ export function activate(context: ExtensionContext) {
   if (processViewer) return;
 
   const provider = new ProcessProvider();
-  processViewer = window.createTreeView(
-    "extension.vscode-processes.processViewer",
-    { treeDataProvider: provider }
-  );
+  processViewer = window.createTreeView("system-task-manager.processViewer", {
+    treeDataProvider: provider
+  });
 
   processViewer.onDidChangeVisibility((e: TreeViewVisibilityChangeEvent) => {
     if (e.visible) {
@@ -34,25 +33,22 @@ export function activate(context: ExtensionContext) {
   });
 
   context.subscriptions.push(
+    commands.registerCommand("system-task-manager.showProcessView", () => {
+      commands.executeCommand(
+        "setContext",
+        "system-task-manager.processViewerContext",
+        true
+      );
+    }),
     commands.registerCommand(
-      "extension.vscode-processes.showProcessView",
-      () => {
-        commands.executeCommand(
-          "setContext",
-          "extension.vscode-processes.processViewerContext",
-          true
-        );
-      }
-    ),
-    commands.registerCommand(
-      "extension.vscode-processes.forceKill",
+      "system-task-manager.forceKill",
       (item: ProcessTreeItem) => {
         if (!item._pid) return;
         process.kill(item._pid, "SIGKILL");
       }
     ),
     commands.registerCommand(
-      "extension.vscode-processes.kill",
+      "system-task-manager.kill",
       (item: ProcessTreeItem) => {
         if (!item._pid) return;
         process.kill(item._pid, "SIGTERM");
