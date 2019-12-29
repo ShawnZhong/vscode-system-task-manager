@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import { SysInfoTreeItem } from "../SysInfoTreeItem";
 import { SysInfoItem } from "./SysInfoItem";
 
-const POLL_INTERVAL = 1000;
+const POLL_INTERVAL = 5000;
 
 // Modified from https://github.com/weinand/vscode-processes/blob/master/src/extension.ts
 export abstract class SysInfoProvider

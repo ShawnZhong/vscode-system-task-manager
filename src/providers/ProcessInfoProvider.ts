@@ -11,7 +11,7 @@ export class ProcessInfoProvider extends SysInfoProvider {
     const processes = data.list
       .sort((p1, p2) => p1.pid - p2.pid)
       .map(process => {
-        const { name, user, started, pid } = process;
+        const { name, user, started, pid, command, params } = process;
 
         const id = pid.toString();
         const load = `${process.pcpu}%`;
@@ -22,7 +22,8 @@ export class ProcessInfoProvider extends SysInfoProvider {
           `CPU Load: ${load}`,
           `Memory: ${mem}`,
           `User: ${user}`,
-          `Start Time: ${started}`
+          `Start Time: ${started}`,
+          `Command: ${command} ${params}`
         ].join("\n");
 
         return { id, pid, tooltip, label } as SysInfoItem;
