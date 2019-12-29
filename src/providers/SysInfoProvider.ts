@@ -21,10 +21,6 @@ export abstract class SysInfoProvider
     return processTreeItem;
   }
 
-  getParent(element: SysInfoTreeItem): SysInfoTreeItem {
-    return element._parent;
-  }
-
   getChildren(
     element?: SysInfoTreeItem
   ): vscode.ProviderResult<SysInfoTreeItem[]> {
@@ -36,7 +32,7 @@ export abstract class SysInfoProvider
       return this._root.getChildren();
     }
 
-    this._root = new SysInfoTreeItem(undefined, 0, "");
+    this._root = new SysInfoTreeItem(0, "");
     return this._getSysInfo().then(root => {
       this._root.merge(root);
       return this._root.getChildren();

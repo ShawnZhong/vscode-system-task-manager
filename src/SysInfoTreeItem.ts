@@ -22,7 +22,7 @@ export class SysInfoTreeItem extends vscode.TreeItem {
    * Update this item with the information from the given ProcessItem.
    * Returns the elementId of the subtree that needs to be refreshed or undefined if nothing has changed.
    */
-  merge(process: SysInfoItem, newItems?: SysInfoTreeItem[]): SysInfoTreeItem {
+  merge(process: SysInfoItem): SysInfoTreeItem {
     if (!process) {
       return undefined;
     }
@@ -46,12 +46,9 @@ export class SysInfoTreeItem extends vscode.TreeItem {
           : undefined;
         if (!found) {
           found = new SysInfoTreeItem(child.pid, child.id);
-          if (newItems) {
-            newItems.push(found);
-          }
           changed = true;
         }
-        const changedChild = found.merge(child, newItems);
+        const changedChild = found.merge(child);
         if (changedChild) {
           childChanges.push(changedChild);
         }
