@@ -31,15 +31,15 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand(
       "system-task-manager.forceKill",
       (item: SysInfoTreeItem) => {
-        if (!item._pid) return;
-        process.kill(item._pid, "SIGKILL");
+        if (!item.pid) return;
+        process.kill(item.pid, "SIGKILL");
       }
     ),
     vscode.commands.registerCommand(
       "system-task-manager.kill",
       (item: SysInfoTreeItem) => {
-        if (!item._pid) return;
-        process.kill(item._pid, "SIGTERM");
+        if (!item.pid) return;
+        process.kill(item.pid, "SIGTERM");
       }
     ),
     vscode.commands.registerCommand("system-task-manager.refresh", () => {

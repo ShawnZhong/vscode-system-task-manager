@@ -5,14 +5,12 @@ import { SysInfoItem } from "./providers";
 
 // Modified from https://github.com/weinand/vscode-processes/blob/master/src/extension.ts
 export class SysInfoTreeItem extends vscode.TreeItem {
-  _parent: SysInfoTreeItem;
-  _pid: number;
+  pid: number;
   _children: SysInfoTreeItem[];
 
-  constructor(parent: SysInfoTreeItem, pid: number, id: string) {
+  constructor(pid: number, id: string) {
     super("", vscode.TreeItemCollapsibleState.None);
-    this._parent = parent;
-    this._pid = pid;
+    this.pid = pid;
     this.id = id;
   }
 
@@ -47,7 +45,7 @@ export class SysInfoTreeItem extends vscode.TreeItem {
           ? this._children.find(c => child.id === c.id)
           : undefined;
         if (!found) {
-          found = new SysInfoTreeItem(this, child.pid, child.id);
+          found = new SysInfoTreeItem(child.pid, child.id);
           if (newItems) {
             newItems.push(found);
           }
