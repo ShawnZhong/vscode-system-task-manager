@@ -20,13 +20,6 @@ export class SysInfoTreeItem extends TreeItem {
     return this._children || [];
   }
 
-  makeTooltip(process: SysInfoItem): string {
-    return process.toString();
-  }
-  makeLabel(process: SysInfoItem): string {
-    return process.toString();
-  }
-
   /*
    * Update this item with the information from the given ProcessItem.
    * Returns the elementId of the subtree that needs to be refreshed or undefined if nothing has changed.
