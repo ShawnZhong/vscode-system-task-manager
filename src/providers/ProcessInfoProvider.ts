@@ -2,7 +2,8 @@
 
 import * as si from "systeminformation";
 import { convertBytesToLargestUnit } from "../utils";
-import { SysInfoItem, SysInfoProvider } from ".";
+import { SysInfoItem } from "./SysInfoItem";
+import { SysInfoProvider } from "./SysInfoProvider";
 
 export class ProcessInfoProvider extends SysInfoProvider {
   async _getSysInfo(): Promise<SysInfoItem> {

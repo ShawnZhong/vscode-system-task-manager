@@ -2,7 +2,7 @@
 
 import * as vscode from "vscode";
 import { SysInfoTreeItem } from "../SysInfoTreeItem";
-import { SysInfoItem } from ".";
+import { SysInfoItem } from "./SysInfoItem";
 
 const POLL_INTERVAL = 1000;
 

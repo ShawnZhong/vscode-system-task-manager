@@ -1,7 +1,8 @@
 "use strict";
 
 import * as si from "systeminformation";
-import { SysInfoItem, SysInfoProvider } from ".";
+import { SysInfoItem } from "./SysInfoItem";
+import { SysInfoProvider } from "./SysInfoProvider";
 
 export class ConnectionInfoProvider extends SysInfoProvider {
   async _getSysInfo(): Promise<SysInfoItem> {
