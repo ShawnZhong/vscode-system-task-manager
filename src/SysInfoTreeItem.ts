@@ -1,16 +1,16 @@
 "use strict";
 
-import { TreeItem, TreeItemCollapsibleState } from "vscode";
+import * as vscode from "vscode";
+import { SysInfoItem } from "./providers";
 
-import { SysInfoItem } from "./provider";
-
-export class SysInfoTreeItem extends TreeItem {
+// Modified from https://github.com/weinand/vscode-processes/blob/master/src/extension.ts
+export class SysInfoTreeItem extends vscode.TreeItem {
   _parent: SysInfoTreeItem;
   _pid: number;
   _children: SysInfoTreeItem[];
 
   constructor(parent: SysInfoTreeItem, pid: number, id: string) {
-    super("", TreeItemCollapsibleState.None);
+    super("", vscode.TreeItemCollapsibleState.None);
     this._parent = parent;
     this._pid = pid;
     this.id = id;
@@ -76,8 +76,8 @@ export class SysInfoTreeItem extends TreeItem {
     // custom explorer bug: https://github.com/Microsoft/vscode/issues/40179
     this.collapsibleState =
       this._children.length > 0
-        ? TreeItemCollapsibleState.Expanded
-        : TreeItemCollapsibleState.None;
+        ? vscode.TreeItemCollapsibleState.Expanded
+        : vscode.TreeItemCollapsibleState.None;
     if (this.collapsibleState !== oldCollapsibleState) {
       changed = true;
     }

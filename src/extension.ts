@@ -1,68 +1,50 @@
-/*---------------------------------------------------------
- * Copyright (C) Microsoft Corporation. All rights reserved.
- *--------------------------------------------------------*/
-
 "use strict";
 
+import * as vscode from "vscode";
+import { SysInfoTreeItem } from "./SysInfoTreeItem";
 import {
-  TreeView,
-  ExtensionContext,
-  commands,
-  window,
-  TreeViewVisibilityChangeEvent
-} from "vscode";
-import { ProcessProvider, ConnectionProvider } from "./provider";
-import { SysInfoTreeItem } from "./ProcessTreeItem";
+  ProcessInfoProvider,
+  ConnectionInfoProvider,
+  SysInfoProvider
+} from "./providers";
 
-export function activate(context: ExtensionContext) {
-  const processProvider = new ProcessProvider();
-  const processViewer: TreeView<SysInfoTreeItem> = window.createTreeView(
-    "system-task-manager.processViewer",
-    {
-      treeDataProvider: processProvider
-    }
-  );
+function _createTreeView(id: string, treeDataProvider: SysInfoProvider) {
+  const treeView = vscode.window.createTreeView(id, { treeDataProvider });
 
-  processViewer.onDidChangeVisibility((e: TreeViewVisibilityChangeEvent) => {
+  treeView.onDidChangeVisibility((e: vscode.TreeViewVisibilityChangeEvent) => {
     if (e.visible) {
-      processProvider.startUpdate();
+      treeDataProvider.startUpdate();
     } else {
-      processProvider.stopUpdate();
+      treeDataProvider.stopUpdate();
     }
   });
+}
 
-  const connectionProvider = new ConnectionProvider();
-  const networkViewer = window.createTreeView(
-    "system-task-manager.networkViewer",
-    {
-      treeDataProvider: connectionProvider
-    }
-  );
-  networkViewer.onDidChangeVisibility((e: TreeViewVisibilityChangeEvent) => {
-    if (e.visible) {
-      connectionProvider.startUpdate();
-    } else {
-      connectionProvider.stopUpdate();
-    }
-  });
+export function activate(context: vscode.ExtensionContext) {
+  const processInfoProvider = new ProcessInfoProvider();
+  const connectionInfoProvider = new ConnectionInfoProvider();
+
+  _createTreeView("system-task-manager.processViewer", processInfoProvider);
+  _createTreeView("system-task-manager.networkViewer", connectionInfoProvider);
 
   context.subscriptions.push(
-    commands.registerCommand(
+    vscode.commands.registerCommand(
       "system-task-manager.forceKill",
       (item: SysInfoTreeItem) => {
         if (!item._pid) return;
         process.kill(item._pid, "SIGKILL");
       }
     ),
-    commands.registerCommand(
+    vscode.commands.registerCommand(
       "system-task-manager.kill",
       (item: SysInfoTreeItem) => {
         if (!item._pid) return;
         process.kill(item._pid, "SIGTERM");
       }
     ),
-    commands.registerCommand("system-task-manager.refresh", () => {
-      processProvider.update();
+    vscode.commands.registerCommand("system-task-manager.refresh", () => {
+      processInfoProvider.update();
+      connectionInfoProvider.update();
     })
   );
 }
