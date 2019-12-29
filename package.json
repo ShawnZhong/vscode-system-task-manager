@@ -1,7 +1,7 @@
 {
   "name": "system-task-manager",
   "displayName": "Task Manager & System Resource Monitor",
-  "description": "Manage Processes, Monitor Resource Usage",
+  "description": "Manage Processes, Check Port Usage, Monitor Resource Usage",
   "version": "1.0.1",
   "publisher": "shawnzhong",
   "author": {
