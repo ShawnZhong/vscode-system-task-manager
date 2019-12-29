@@ -4,7 +4,7 @@
   "description": "Manage Processes, Check Port Usage, Monitor System Resource Usage",
   "icon": "resources/icon.png",
   "version": "1.0.1",
-  "publisher": "shawnzhong",
+  "publisher": "Shawn Zhong",
   "author": {
     "name": "Shawn Zhong",
     "email": "public@shawnzhong.com"
@@ -97,7 +97,11 @@
       },
       {
         "command": "system-task-manager.refresh",
-        "title": "Refresh"
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
       }
     ]
   }
