@@ -77,32 +77,27 @@ abstract class SysInfoProvider implements TreeDataProvider<SysInfoTreeItem> {
 }
 
 export class ProcessProvider extends SysInfoProvider {
-  private _makeSysInfoItem(process: si.ProcessesProcessData): SysInfoItem {
-    const { name, user, started, pid } = process;
-
-    const id = pid.toString();
-
-    const load = `${process.pcpu}%`;
-    const mem = convertBytesToLargestUnit(process.mem_rss);
-
-    const tooltip = [
-      `Process: ${name} (${pid})`,
-      `CPU Load: ${load}`,
-      `Memory: ${mem}`,
-      `User: ${user}`,
-      `Start Time: ${started}`
-    ].join("\n");
-
-    const label = `${name} (${load}, ${mem})`;
-
-    return { id, pid, tooltip, label };
-  }
-
   async _getSysInfo(): Promise<SysInfoItem> {
     const data = await getProcesses();
     const processes = data.list
       .sort((p1, p2) => p1.pid - p2.pid)
-      .map(this._makeSysInfoItem);
+      .map(process => {
+        const { name, user, started, pid } = process;
+
+        const id = pid.toString();
+        const load = `${process.pcpu}%`;
+        const mem = convertBytesToLargestUnit(process.mem_rss);
+        const label = `${name} (${load}, ${mem})`;
+        const tooltip = [
+          `Process: ${name} (${pid})`,
+          `CPU Load: ${load}`,
+          `Memory: ${mem}`,
+          `User: ${user}`,
+          `Start Time: ${started}`
+        ].join("\n");
+
+        return { id, pid, tooltip, label } as SysInfoItem;
+      });
 
     const root = {} as SysInfoItem;
     root.children = processes;
