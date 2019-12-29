@@ -4,7 +4,7 @@
   "description": "Manage Processes, Check Port Usage, Monitor System Resource Usage",
   "icon": "resources/icon.png",
   "version": "1.0.1",
-  "publisher": "Shawn Zhong",
+  "publisher": "shawnzhong",
   "author": {
     "name": "Shawn Zhong",
     "email": "public@shawnzhong.com"
