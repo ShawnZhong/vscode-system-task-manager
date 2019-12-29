@@ -75,10 +75,12 @@
       ],
       "view/item/context": [
         {
-          "command": "system-task-manager.kill"
+          "command": "system-task-manager.kill",
+          "group": "1_kill@1"
         },
         {
-          "command": "system-task-manager.forceKill"
+          "command": "system-task-manager.forceKill",
+          "group": "1_kill@2"
         }
       ]
     },
