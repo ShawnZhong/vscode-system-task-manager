@@ -23,13 +23,13 @@ export class ConnectionInfoProvider extends SysInfoProvider {
       } = connection;
 
       const tooltip = [
-        process ? `Procrss: ${process} (${pid})` : `PID: ${pid}`,
+        process ? `Process: ${process} (${pid})` : `PID: ${pid}`,
         `Local: ${localaddress}:${localport}`,
         `Remote: ${peeraddress}:${peerport}`,
         `Protocal: ${protocol}`,
         `State: ${state}`
       ].join("\n");
-      const label = `Port ${localport}: ${state}`;
+      const label = `${localport} → ${peeraddress}:${peerport}`;
       const id = label;
 
       processes[connection.localport] = { id, pid, tooltip, label };

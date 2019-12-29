@@ -62,7 +62,7 @@
         },
         {
           "id": "system-task-manager.networkViewer",
-          "name": "Network"
+          "name": "Network Connections"
         }
       ]
     },
