@@ -14,10 +14,6 @@ ext install shawnzhong.system-task-manager
 
 ## Features
 
-### Manage Processes
-
-<img src="assets/image-20191229234253350.png" alt="image-20191229234253350" style="zoom:50%;" />
-
-### Check Port Usage
-
-<img src="assets/image-20191229234402001.png" alt="image-20191229234402001" style="zoom:50%;" />
+|                       Manage Processes                       |                       Check Port Usage                       |
+| :----------------------------------------------------------: | :----------------------------------------------------------: |
+| <img src="assets/image-20191229234253350.png" alt="image-20191229234253350" /> | <img src="assets/image-20191229234402001.png" alt="image-20191229234402001" /> |
