@@ -3,7 +3,7 @@
   "displayName": "Task Manager & Resource Monitor",
   "description": "Manage Processes, Check Port Usage, Monitor System Resource Usage",
   "icon": "resources/icon.png",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "publisher": "shawnzhong",
   "author": {
     "name": "Shawn Zhong",
